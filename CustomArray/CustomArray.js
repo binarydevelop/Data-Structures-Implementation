@@ -4,7 +4,7 @@ class CustomArray {
 
     // constructor function
     constructor(length = 0){
-        this.#checkLength(length)
+        this.#setLength(length)
         this.data = [];
     }
 
@@ -21,7 +21,7 @@ class CustomArray {
         throw new Error('Cannot assign length directly')
     }
 
-    #checkLength(value){ // [private function] check Length and create an array [internal usage only] 
+    #setLength(value){ // [private function] check Length and create an array [internal usage only] 
         value < 0 ? value = 0: value = value
         this._length = value
     }
@@ -93,8 +93,13 @@ class CustomArray {
     }
 
     //reduce
-    reduce(){
-        
+    reduce(reducerCallback, initialValue = 0, array = this.data){
+        let value = initialValue
+        for(let i = 0; i < array.length ; i++){
+            let currentValue = array[i]
+            value = reducerCallback(value, currentValue)
+        }
+        return value;
     }
 
     //find
@@ -138,12 +143,34 @@ class CustomArray {
     unshift(...list){
         for(let i = this.data.length; i >= 0; i-- ){
             this.data[i + list.length] = this.data[i];
+            console.log(i + list.length)
         }
         for(let j = 0; j < list.length ; j++){
             this.data[j] = list[j];
         }
         this.data.length--; 
         this.#fixLength();
+    }
+
+    //map
+    map(callbackFn){
+        let modifiedArray = new CustomArray();
+        for(let i = 0; i< this.data.length; i++){
+            modifiedArray.pushOne(callbackFn(this.data[i], i, this));
+        }
+        return modifiedArray;
+    }
+
+    //filter
+    filter(filterCallback){
+        let filteredArray = new CustomArray();
+        for (let i = 0; i < this.data.length ; i++){
+            let result = filterCallback(this.data[i]);
+            if(result){ // the callback will return true or false based on the condition if true it pushes it in the filtered array
+                filteredArray.pushOne(this.data[i])
+            }
+        }
+       return filteredArray
     }
 
 }
